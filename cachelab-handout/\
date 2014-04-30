@@ -1,0 +1,160 @@
+#include<stdio.h>
+#include<math.h>
+#include<getopt.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct cacheLine {
+	int valid;
+	int tag;
+	int counter;
+};
+
+char *hexLookup(char hexValue){
+	switch(hexValue){
+		case '0': return("0000"); break;
+             	case '1': return("0001"); break;
+             	case '2': return("0010"); break;
+             	case '3': return("0011"); break;
+             	case '4': return("0100"); break;
+             	case '5': return("0101"); break;
+             	case '6': return("0110"); break;
+             	case '7': return("0111"); break;
+             	case '8': return("1000"); break;
+             	case '9': return("1001"); break;
+             	case 'A': return("1010"); break;
+             	case 'B': return("1011"); break;
+             	case 'C': return("1100"); break;
+             	case 'D': return("1101"); break;
+             	case 'E': return("1110"); break;
+             	case 'F': return("1111"); break;
+             	case 'a': return("1010"); break;
+             	case 'b': return("1011"); break;
+            	case 'c': return("1100"); break;
+             	case 'd': return("1101"); break;
+             	case 'e': return("1110"); break;
+             	case 'f': return("1111"); break;
+		default: return("foo");
+	}
+}
+
+int parseBlockBits(int address){
+	return 1;
+}
+
+char *paddedBits(char *bits){
+	char paddedBits[100];
+	int len = 64 - strlen(bits);
+	for (int i = len; i > 0; i --){
+		paddedBits[i] = '0';
+	}
+	printf("padded : %s\n", paddedBits);
+	return "foo";
+}
+	
+char *hexToBin(char *buf, char *address){
+
+	int addressLen = strlen(address);
+	int padLen = 64 - (4*addressLen);
+	printf("%i\n", padLen);
+	
+	char bin[100] = {0};
+	char *binVal;
+
+
+	for (int i=0; i<addressLen; i++){
+		binVal = hexLookup(address[i]);
+		strcat(bin, binVal);
+	}
+	buf = bin;
+	return buf;
+
+}
+
+char *parseFile(char *inputFile){
+	FILE *fp;
+	char instruction;
+	int address;
+	int size;
+	char strAddress[10];
+	char *binAddress;
+	char *binAddress2;
+	//char *padBits;
+
+	fp = fopen(inputFile, "r");	
+
+	if (fp == NULL){
+		printf("file broke\n");
+		return 0;
+	}
+	
+	while(1){
+		fscanf(fp, " %c %x, %i", &instruction, &address, &size);
+		if (instruction == 'I'){
+			continue;
+		}
+		if (feof(fp)){
+			break;
+		}
+
+		char *buf = malloc(64 * sizeof(char));
+		//char *padBuf = malloc(64 * sizeof(char));
+
+		sprintf(strAddress, "%x", address);
+		binAddress = hexToBin(buf, strAddress);
+		strcpy(binAddress, binAddress2);
+		printf("bin 2 : %s\n", binAddress2);
+		paddedBits(binAddress2); 		
+
+		//printf("instruction : %c\n", instruction);
+		//printf("size        : %i\n", size);
+		printf("address [hex] : %x\n", address); 
+		printf("address [bin] : %s\n", binAddress);
+		//printf("padded  [bin] : %s\n", padBits);
+		free(buf);	
+				
+	}	
+	return inputFile;	
+}
+
+int main(int argc, char **argv){
+	int opt;
+	int setbits;
+	int blockbits;
+	char *trace;
+	int lines;
+	char *returnVal;
+
+	while ((opt = getopt(argc, argv, "v:s:E:b:t:")) != -1){
+		switch(opt) {
+		
+		case 'h':
+			// help menu
+			break;
+		case 't':
+			trace = optarg;
+			break;
+		case 's':
+			setbits = atoi(optarg);
+			break;
+		case 'b':
+			blockbits = atoi(optarg);
+			break;
+		case 'E':
+			lines = atoi(optarg);
+			break;
+		}
+	}
+	// debug, remove
+	printf("set bits   : %i\n", setbits);
+	printf("lines      : %i\n", lines);
+	printf("block bits : %i\n", blockbits);
+	printf("trace file : %s\n", trace);
+	returnVal = parseFile(trace);	
+}
+
+
+// step 1 :
+// 1. read line from file
+// 2. parse instruction
+// 3. parse address
